@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>F1 Grand Prix: Multi-Level Racing 3D</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <div id="gameWrapper">
+
+    <!-- 1. WELCOME / TITLE SCREEN -->
+    <div id="mainTitleScreen" class="overlay-ui title-screen">
+      <div class="title-content">
+        <div class="f1-badge">FORMULA 1 RACING 3D</div>
+        <h1 class="main-heading">SPEED CHALLENGE</h1>
+        <p class="main-sub">Compete against 4 rival F1 machines and conquer world-class racing circuits!</p>
+
+        <div class="rules-mini-card">
+          <div class="rule-col">🎮 <b>Controls:</b> [A/D] or [⬅️/➡️] Steer | [W/⬆️] Accelerate | [S/⬇️] Brake</div>
+          <div class="rule-col">🌧️ <b>Weather:</b> Rain & wet physics enabled on Suzuka GP!</div>
+          <div class="rule-col">📻 <b>Team Radio:</b> Listen to live pit wall calls during the race!</div>
+          <div class="rule-col">🏁 <b>Objective:</b> Cross the finish line on a podium position (P1 - P3)!</div>
+        </div>
+
+        <button id="mainStartBtn" class="race-now-btn pulse-btn">START GAME 🏎️</button>
+      </div>
+    </div>
+
+    <!-- 2. CAR & DRIVER SELECTION SCREEN -->
+    <div id="carSelectScreen" class="overlay-ui hidden">
+      <div class="drag-hint">🖱️ Touch & Drag to rotate 360°</div>
+
+      <div class="bottom-panel">
+        <div class="flow-header">
+          <span class="step-badge">STEP 1 / 2</span>
+          <span class="step-title">SELECT MACHINE & DRIVER</span>
+        </div>
+
+        <div class="car-title-card">
+          <button id="prevBtn" class="arrow-btn">◀</button>
+          <div class="car-text">
+            <h2 id="carName">Red Bull Racing RB20</h2>
+            <div id="driverBadge" class="driver-badge">👨‍🚀 Driver: Max Verstappen #1</div>
+            <p id="carDesc">High aerodynamic stability built for fast and flowing corners.</p>
+          </div>
+          <button id="nextBtn" class="arrow-btn">▶</button>
+        </div>
+
+        <div class="specs-card">
+          <div class="spec-row">
+            <span class="spec-label">TOP SPEED</span>
+            <div class="spec-bar-bg"><div id="barSpeed" class="spec-bar speed-gradient"></div></div>
+            <span id="valSpeed" class="spec-num color-gold">320 km/h</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">ACCEL (0-100)</span>
+            <div class="spec-bar-bg"><div id="barAccel" class="spec-bar accel-gradient"></div></div>
+            <span id="valAccel" class="spec-num color-blue">2.4 s</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">HANDLING</span>
+            <div class="spec-bar-bg"><div id="barHandling" class="spec-bar handling-gradient"></div></div>
+            <span id="valHandling" class="spec-num color-green">94/100</span>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="backToTitleBtn" class="back-btn">⬅ MENU</button>
+          <button id="goToTrackBtn" class="race-now-btn flex-1">NEXT: SELECT CIRCUIT ➡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. CIRCUIT SELECTION SCREEN -->
+    <div id="trackSelectScreen" class="overlay-ui hidden">
+      <div class="bottom-panel track-page-panel">
+        <div class="flow-header">
+          <span class="step-badge">STEP 2 / 2</span>
+          <span class="step-title">SELECT GRAND PRIX CIRCUIT</span>
+        </div>
+
+        <div class="track-cards-list">
+          <div class="track-card active" data-lvl="0">
+            <div class="track-card-header">
+              <span class="track-flag">🇮🇹</span>
+              <h4>MONZA GP (DAY)</h4>
+              <span class="diff-badge easy">EASY</span>
+            </div>
+            <p>Fast straightaways in bright daylight with gentle, sweeping corners (3,000 m).</p>
+          </div>
+
+          <div class="track-card" data-lvl="1">
+            <div class="track-card-header">
+              <span class="track-flag">🇯🇵</span>
+              <h4>SUZUKA GP (WET / RAIN)</h4>
+              <span class="diff-badge med">WET TRACK</span>
+            </div>
+            <p>🌧️ Rainy conditions with slippery road surface and S-Curves (4,000 m).</p>
+          </div>
+
+          <div class="track-card" data-lvl="2">
+            <div class="track-card-header">
+              <span class="track-flag">🇸🇬</span>
+              <h4>SINGAPORE (NIGHT)</h4>
+              <span class="diff-badge hard">HARD</span>
+            </div>
+            <p>Neon-lit night street circuit with tight and unforgiving turns (5,000 m).</p>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="backToCarBtn" class="back-btn">⬅ CHANGE CAR</button>
+          <button id="startRaceFinalBtn" class="race-now-btn flex-1">START RACE 🏁</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. COUNTDOWN OVERLAY -->
+    <div id="countdownBox" class="countdown-overlay hidden">
+      <div id="countdownText" class="countdown-text">3</div>
+    </div>
+
+    <!-- 5. IN-RACE TOP ACTION BUTTONS -->
+    <div id="raceTopControls" class="race-top-controls hidden">
+      <button id="btnPause" class="hud-circle-btn" title="Pause Game">⏸️</button>
+      <button id="btnRestartRace" class="hud-circle-btn" title="Restart Circuit">🔄</button>
+      <button id="btnMute" class="hud-circle-btn" title="Mute Audio">🔊</button>
+    </div>
+
+    <!-- 6. PAUSE POPUP MODAL -->
+    <div id="pauseMenuOverlay" class="overlay-ui hidden pause-modal">
+      <div class="pause-box">
+        <h2>GAME PAUSED ⏸️</h2>
+        <p>Take a breath, pit stop in progress!</p>
+        <div class="pause-btn-stack">
+          <button id="btnResume" class="race-now-btn">RESUME RACE ▶️</button>
+          <button id="btnRestartFromPause" class="back-btn">RESTART CIRCUIT 🔄</button>
+          <button id="btnExitToMenu" class="back-btn">EXIT TO MENU 🏁</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. RACE HUD & TEAM RADIO POPUP -->
+    <div id="raceHud" class="race-hud hidden">
+      <!-- Kotak Radio Jurutera Pasukan (Pit Wall Radio) -->
+      <div id="pitRadioBox" class="pit-radio-box hidden">
+        <div class="radio-header">
+          <span class="radio-icon">📻</span>
+          <span class="radio-title">PIT WALL RADIO</span>
+          <span class="radio-waves">●)))</span>
+        </div>
+        <div id="radioMsgText" class="radio-text">"Push now, great pace!"</div>
+      </div>
+
+      <div class="hud-left">
+        <div id="currentLvlBadge" class="level-badge-hud">LVL 1</div>
+        <div id="posDisplay" class="pos-badge">P 5 / 5</div>
+        <div id="speedVal" class="speed-num">0</div>
+        <div class="speed-unit">KM/H</div>
+      </div>
+      
+      <div class="hud-center">
+        <div class="track-bar-container">
+          <span class="flag-icon">🏁</span>
+          <div class="track-bar-bg" id="trackBarBg">
+            <div id="trackProgress" class="track-bar-fill"></div>
+            <div id="trackMarkersContainer" class="track-markers-container">
+              <div id="markerPlayer" class="car-marker player-marker" title="You"></div>
+              <div id="markerAI0" class="car-marker ai-marker mclaren"></div>
+              <div id="markerAI1" class="car-marker ai-marker aston"></div>
+              <div id="markerAI2" class="car-marker ai-marker ferrari"></div>
+              <div id="markerAI3" class="car-marker ai-marker williams"></div>
+            </div>
+          </div>
+          <span id="distVal" class="dist-text">3000 m</span>
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <div>TIME: <b id="timeLiveVal">0</b>s</div>
+        <div>SCORE: <b id="scoreVal">0</b></div>
+      </div>
+    </div>
+
+    <!-- 8. MOBILE TOUCH CONTROLS -->
+    <div id="mobileControls" class="mobile-controls-panel hidden">
+      <div class="mobile-steer-cluster">
+        <button id="touchLeft" class="touch-control-btn steer-btn">◀</button>
+        <button id="touchRight" class="touch-control-btn steer-btn">▶</button>
+      </div>
+      <div class="mobile-pedal-cluster">
+        <button id="touchBrake" class="touch-control-btn brake-btn">BRAKE</button>
+        <button id="touchGas" class="touch-control-btn gas-btn">GAS ⚡</button>
+      </div>
+    </div>
+
+    <!-- 9. END SCREEN -->
+    <div id="endUI" class="overlay-ui hidden end-screen">
+      <h1 id="endHeading">CHECKERED FLAG!</h1>
+      <h2 id="finalPosBadge" style="font-size: 32px; color: #facc15; margin: 10px 0;">PODIUM P1!</h2>
+      <p id="endSub"></p>
+      <div class="final-score">Race Time: <span id="finalTimeVal">0</span>s | Score: <span id="finalScoreVal">0</span></div>
+      
+      <div class="end-actions">
+        <button id="nextLvlBtn" class="race-now-btn" style="background: #16a34a;">NEXT LEVEL ⏩</button>
+        <button id="restartBtn" class="race-now-btn">RETURN TO MENU</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
